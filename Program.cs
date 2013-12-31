@@ -171,18 +171,19 @@ namespace FNM
         private static void TestNBMining()
         {
             IndexedGraph g = new IndexedGraph();
-            g.Read(@"D:\Users\v-jiahan\HORM\Data\Xiaojiang_graph_N2U.txt");
+            g.Read(@"E:\MSRA备份\wdm7备份\Data\HORM data\ex3_graph.txt");
             FrequentNeighborhoodMining fnMiner = new FrequentNeighborhoodMining(g);
-            int[] examples = new int[] { 1874,1875 };
-            List<Tuple<IndexedGraph, List<int>>> ret = fnMiner.MineAndQBE(examples,2);
+            var ret = fnMiner.Mine(1000, 4);
+            /*
             foreach (var pair in ret)
             {
                 pair.Item1.Print();
-                Console.WriteLine("Results Count: "+pair.Item2.Count+".Such as...");
-                for (int i = 0; i < 2 && i < pair.Item2.Count; i++)
-                    Console.Write(pair.Item2[i] + " ");
+                Console.WriteLine(pair.Item1.Is_R_EgoNet(1));
                 Console.WriteLine();
+                Console.ReadKey();
             }
+             * */
+            Console.WriteLine(100.0*ret.Count(e=>e.Item1.Is_R_EgoNet(2))/ret.Count);
             return;
         }
     }

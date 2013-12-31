@@ -232,6 +232,43 @@ namespace FNM
             }
             return false;
         }
+
+        public bool Is_R_EgoNet(int radius)//Assert: graph is connected, pivot is node0
+        {
+            Queue<Tuple<int, int>> queue = new Queue<Tuple<int, int>>();
+            HashSet<int> visitedV = new HashSet<int>();
+            queue.Enqueue(new Tuple<int, int>(0, 0));
+            visitedV.Add(0);
+            int[] dist = new int[_vertexes.Length];
+            while (queue.Count > 0)
+            {
+                var tup = queue.Dequeue();
+                Vertex v = _vertexes[tup.Item1];
+                foreach (int eid in v._inEdge)
+                {
+                    Edge e = _edges[eid];
+                    if (visitedV.Contains(e._from))
+                        continue;
+                    visitedV.Add(e._from);
+                    if (tup.Item2 == radius)
+                        return false;
+                    queue.Enqueue(new Tuple<int, int>(e._from, tup.Item2 + 1));
+                }
+                foreach (int eid in v._outEdge)
+                {
+                    Edge e = _edges[eid];
+                    if (visitedV.Contains(e._to))
+                        continue;
+                    visitedV.Add(e._to);
+                    if (tup.Item2 == radius)
+                        return false;
+                    queue.Enqueue(new Tuple<int, int>(e._to, tup.Item2 + 1));
+                }
+            }
+            if (visitedV.Count < _vertexes.Length)
+                return false;
+            return true;
+        }
     }
 
     public class IndexedGraph : Graph

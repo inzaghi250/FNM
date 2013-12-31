@@ -179,16 +179,17 @@ namespace FNM
         {
             if (_delta1 is VLabel)
             {
-                VLabel vlabel=(VLabel)_delta1;
-                Vertex v = _g._vertexes[_vMap[vlabel._vid]];
+                VLabel vlabel = (VLabel)_delta1;
+                int targetVID = _vMap[vlabel._vid];
+                Vertex v = _g._vertexes[targetVID];
                 if (v._vLabel.Contains(vlabel._vlid))
                     return;
-                IndexedGraph g=_g.ShallowCopy();
-                int[] originalLabels = g._vertexes[vlabel._vid]._vLabel;
-                g._vertexes[vlabel._vid]._vLabel = new int[originalLabels.Length + 1];
-                originalLabels.CopyTo(g._vertexes[vlabel._vid]._vLabel, 0);
-                g._vertexes[vlabel._vid]._vLabel[originalLabels.Length] = vlabel._vlid;
-                
+                IndexedGraph g = _g.ShallowCopy();
+                int[] originalLabels = g._vertexes[targetVID]._vLabel;
+                g._vertexes[targetVID]._vLabel = new int[originalLabels.Length + 1];
+                originalLabels.CopyTo(g._vertexes[targetVID]._vLabel, 0);
+                g._vertexes[targetVID]._vLabel[originalLabels.Length] = vlabel._vlid;
+
                 g.GenIndex();
                 _retJoins.Add(g);
             }
@@ -781,7 +782,7 @@ namespace FNM
 
         public List<Tuple<IndexedGraph, int>> Mine(int minSupp, int maxSize, int[] constraintVSet)
         {
-            bool useVIDList = false;
+            bool useVIDList = true;
 
             List<int> constraintVSetList = constraintVSet.ToList();
 

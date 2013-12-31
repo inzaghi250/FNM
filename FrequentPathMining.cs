@@ -376,7 +376,7 @@ namespace FNM
                 var pair1 = queue[fronti++];
                 Path thisPath = pair1.Item1;
                 //Console.WriteLine("Expanding...");
-                if (thisPath.Count > maxSize - 1)
+                if (thisPath.Count >= maxSize)
                     break;
                 List<int> scanedVID=null;
                 if (useVIDList)
