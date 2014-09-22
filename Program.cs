@@ -168,22 +168,51 @@ namespace FNM
             return;
         }
 
+        static void Diff(List<IndexedGraph> rs1,List<IndexedGraph> rs2)
+        {
+            SubGraphTest sgt = new SubGraphTest();
+            HashSet<int> notin1 = new HashSet<int>();
+            for (int i = 0; i < rs2.Count; i++)
+                notin1.Add(i);
+            Console.WriteLine("1 not in 2:");
+            foreach(IndexedGraph g1 in rs1)
+            {
+                bool inrs2=false;
+                for(int i=0;i<rs2.Count;i++)
+                {
+                    IndexedGraph g2=rs2[i];
+                    if(sgt.MatchNeighborhood(g1,g2,0)&&sgt.MatchNeighborhood(g2,g1,0))
+                    {
+                        inrs2=true;
+                        notin1.Remove(i);
+                        break;
+                    }
+                }
+                if(!inrs2)
+                    g1.Print();
+            }
+            Console.WriteLine("2 not in 1:");
+            foreach (int i in notin1)
+                rs2[i].Print();
+        }
+
         private static void TestNBMining()
         {
             IndexedGraph g = new IndexedGraph();
-            g.Read(@"E:\MSRA备份\wdm7备份\Data\HORM data\ex3_graph.txt");
+            g.Read(@"E:\uqjhan5\HORM data\ex3_graph.txt");
             FrequentNeighborhoodMining fnMiner = new FrequentNeighborhoodMining(g);
-            var ret = fnMiner.Mine(1000, 4);
-            /*
-            foreach (var pair in ret)
-            {
-                pair.Item1.Print();
-                Console.WriteLine(pair.Item1.Is_R_EgoNet(1));
-                Console.WriteLine();
-                Console.ReadKey();
-            }
-             * */
-            Console.WriteLine(100.0*ret.Count(e=>e.Item1.Is_R_EgoNet(2))/ret.Count);
+
+            //var ret1 = fnMiner.Mine(1500, 5);
+            //Console.WriteLine(ret1.Count(e => e.Item1.Is_R_EgoNet(1)));
+            //Console.WriteLine(ret1.Count(e => e.Item1.Is_R_EgoNet(2)));
+            //Console.WriteLine(ret1.Count(e => e.Item1.Is_R_EgoNet(3)));
+            //Console.WriteLine(ret1.Count(e => e.Item1.Is_R_EgoNet(4)));
+
+            var ret2 = fnMiner.MineEgonet(1500, 5, 2);
+
+            //Diff(ret1, ret2);
+
+            Console.WriteLine(ret2.Count);
             return;
         }
     }

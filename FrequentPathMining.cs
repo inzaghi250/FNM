@@ -189,7 +189,7 @@ namespace FNM
             Init(g, minSupp, maxSize, constraintVSet,useVIDList);
         }
 
-        public virtual void Init(Graph g, int minSupp, int maxSize, int[] constraintVSet, bool useVIDList)
+        public virtual void Init(Graph g, int minSupp, int maxSize, int[] constraintVSet, bool useVIDList,int maxRadius = 100)
         {
             throw new NotImplementedException();
         }
@@ -244,13 +244,15 @@ namespace FNM
             static Path _path;
             static Graph _g;
             static int _nodeId;
+            static bool _vLabelOnly;
 
             static HashSet<Step> _ret = new HashSet<Step>();
             static HashSet<int> _nodeUsed = new HashSet<int>();
 
-            public static List<Step> GetNextStep(Path path, Graph g, int nodeId)
+            public static List<Step> GetNextStep(Path path, Graph g, int nodeId,bool VLabelOnly=false)
             {
                 _path = path; _g = g; _nodeId = nodeId;
+                _vLabelOnly = VLabelOnly;
                 _ret.Clear();
                 _nodeUsed.Clear();
                 _nodeUsed.Add(nodeId);
@@ -264,21 +266,24 @@ namespace FNM
                 Vertex v = _g._vertexes[nodeId];
                 if (depth == _path.Count)
                 {
-                    foreach (int eid in v._inEdge)
+                    if (!_vLabelOnly)
                     {
-                        Edge e = _g._edges[eid];
-                        if (_nodeUsed.Contains(e._from))
-                            continue;
-                        Step step = new Step(e._eLabel, StepType.Backward);
-                        _ret.Add(step);
-                    }
-                    foreach (int eid in v._outEdge)
-                    {
-                        Edge e = _g._edges[eid];
-                        if (_nodeUsed.Contains(e._to))
-                            continue;
-                        Step step = new Step(e._eLabel, StepType.Forward);
-                        _ret.Add(step);
+                        foreach (int eid in v._inEdge)
+                        {
+                            Edge e = _g._edges[eid];
+                            if (_nodeUsed.Contains(e._from))
+                                continue;
+                            Step step = new Step(e._eLabel, StepType.Backward);
+                            _ret.Add(step);
+                        }
+                        foreach (int eid in v._outEdge)
+                        {
+                            Edge e = _g._edges[eid];
+                            if (_nodeUsed.Contains(e._to))
+                                continue;
+                            Step step = new Step(e._eLabel, StepType.Forward);
+                            _ret.Add(step);
+                        }
                     }
                     foreach (int lid in v._vLabel)
                     {
@@ -360,7 +365,7 @@ namespace FNM
         //    }
         //}
 
-        public override void Init(Graph g, int minSupp, int maxSize, int[] constraintVSet, bool useVIDList)
+        public override void Init(Graph g, int minSupp, int maxSize, int[] constraintVSet, bool useVIDList, int maxRadius = 100)
         {
             _resultCache.Clear();
             List<Tuple<Path, object>> queue = new List<Tuple<Path, object>>();
@@ -376,7 +381,7 @@ namespace FNM
                 var pair1 = queue[fronti++];
                 Path thisPath = pair1.Item1;
                 //Console.WriteLine("Expanding...");
-                if (thisPath.Count >= maxSize)
+                if (thisPath.Count >= maxSize || thisPath.Count > maxRadius)
                     break;
                 List<int> scanedVID=null;
                 if (useVIDList)
@@ -385,7 +390,11 @@ namespace FNM
                     scanedVID = constraintVSet.ToList();
                 foreach (int i in scanedVID)
                 {
-                    List<Step> steps = GetNextStepGivenNode.GetNextStep(thisPath, g, i);
+                    List<Step> steps=null;
+                    if (thisPath.Count == maxRadius)
+                        steps = GetNextStepGivenNode.GetNextStep(thisPath, g, i, true);
+                    else
+                        steps = GetNextStepGivenNode.GetNextStep(thisPath, g, i);
                     foreach (Step step in steps)
                     {
                         if (!mapStep2VidsOrCounts.ContainsKey(step))

@@ -269,6 +269,43 @@ namespace FNM
                 return false;
             return true;
         }
+
+        public int[] GetDistArray()
+        {
+            int[] ret = new int[_vertexes.Length];
+            Queue<Tuple<int, int>> queue = new Queue<Tuple<int, int>>();
+            HashSet<int> visitedV = new HashSet<int>();
+            queue.Enqueue(new Tuple<int, int>(0, 0));
+            visitedV.Add(0);
+            int[] dist = new int[_vertexes.Length];
+            while (queue.Count > 0)
+            {
+                var tup = queue.Dequeue();
+                ret[tup.Item1] = tup.Item2;
+                Vertex v = _vertexes[tup.Item1];
+                foreach (int eid in v._inEdge)
+                {
+                    Edge e = _edges[eid];
+                    int otherVID = e._from;
+                    if (visitedV.Contains(otherVID))
+                        continue;
+                    visitedV.Add(otherVID);
+                    queue.Enqueue(new Tuple<int, int>(otherVID, tup.Item2 + 1));
+                }
+                foreach (int eid in v._outEdge)
+                {
+                    Edge e = _edges[eid];
+                    int otherVID = e._to;
+                    if (visitedV.Contains(otherVID))
+                        continue;
+                    visitedV.Add(otherVID);
+                    queue.Enqueue(new Tuple<int, int>(otherVID, tup.Item2 + 1));
+                }
+            }
+            if (visitedV.Count < _vertexes.Length)
+                return null;
+            return ret;
+        }
     }
 
     public class IndexedGraph : Graph
