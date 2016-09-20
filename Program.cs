@@ -199,7 +199,7 @@ namespace FNM
         private static void TestNBMining()
         {
             IndexedGraph g = new IndexedGraph();
-            g.Read(@"E:\uqjhan5\yago2s_tsv\conv\yago2_graph.txt");
+            g.Read(@"E:\RkNPQ\yago2s_tsv\conv\yago2_graph.txt");
             FrequentNeighborhoodMining fnMiner = new FrequentNeighborhoodMining(g);
 
             var ret = fnMiner.MineEgonet(3, 4, 2, new int[] { 109374, 570862, 1033940 });

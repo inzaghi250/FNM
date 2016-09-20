@@ -966,7 +966,7 @@ namespace FNM
             ret.AddRange(fpm.GetPathAndVID(1));
 
             //IndexedGraph z = new IndexedGraph();
-            //z.Read(@"E:\uqjhan5\1.txt");
+            //z.Read(@"E:\RkNPQ\1.txt");
             //SubGraphTest sgt1 = new SubGraphTest();
 
             for (int size = 2; size <= maxSize; size++)
